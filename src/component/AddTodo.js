@@ -1,38 +1,76 @@
 import React, { Component } from "react";
 import { Button, TextField } from "@mui/material";
+import { DesktopDatePicker , LocalizationProvider} from '@mui/x-date-pickers';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 class AddTodo extends Component {
   // Create a local react state of the this component with both content date property set to nothing.
   constructor() {
     super();
     this.state = {
-      content: "",
-      date: ""
+      task: "",
+      preCondition: "",
+      acceptanceCriteria: "",
+      date: "",
+      dueDate: null
     };
   }
   // The handleChange function updates the react state with the new input value provided from the user and the current date/time.
   // "event" is the defined action a user takes. In this case, the event is triggered when the user types something
   // into the text field.
   handleChange = (event) => {
+    if(event.target.name === "task"){
+      this.setState((prevState) => {
+        return({
+          ...prevState,
+          task: event.target.value,
+          date: Date().toLocaleString('en-US')
+        });
+      });
+    }
+    if(event.target.name === "preCondition"){
+      this.setState((prevState) => {
+        return({
+          ...prevState,
+          preCondition: event.target.value,
+          date: Date().toLocaleString('en-US')
+        });
+      });
+    }
+    if(event.target.name === "acceptanceCriteria"){
+      this.setState((prevState) => {
+        return({
+          ...prevState,
+          acceptanceCriteria: event.target.value,
+          date: Date().toLocaleString('en-US')
+        });
+      });
+    }
+  };
+  handleDateChange = (date) => {
     this.setState({
-      content: event.target.value,
-      date: Date().toLocaleString('en-US')
+      dueDate: new Date(date).toLocaleDateString('en-US')
     });
   };
+  
   // The handleSubmit function collects the forms input and puts it into the react state.
   // event.preventDefault() is called to prevents default event behavior like refreshing the browser.
   // this.props.addTodo(this.state) passes the current state (or user input and current date/time) into the addTodo function defined
   // in the Home.js file which then adds the input into the list.
   handleSubmit = (event) => {
     event.preventDefault();
-    if (this.state.content.trim()) {
+    if (this.state.task.trim()) {
       this.props.addTodo(this.state);
       this.setState({
-        content: "",
-        date: ""
+        task: "",
+        acceptanceCriteria: "",
+        preCondition: "",
+        date: "",
+        dueDate: null
       });
     }
   };
+
   render() {
     return (
       // 1. When rendering a component, you can render as many elements as you like as long as it is wrapped inside
@@ -44,16 +82,43 @@ class AddTodo extends Component {
       // 4. The value of the text field also should reflect the local state of this component.
       <div>
         <TextField
-          label="Add New Item"
+          label="Add New Task"
           variant="outlined"
           onChange={this.handleChange}
-          value={this.state.content}
+          value={this.state.task}
+          name="task"
+          data-testid="new-item-textfield"
         />
+         <TextField
+          label="Add Pre-Condition"
+          variant="outlined"
+          onChange={this.handleChange}
+          value={this.state.preCondition}
+          name="preCondition"
+          data-testid="new-item-preCondition"
+        />
+          <TextField
+          label="Add Acceptance Criteria"
+          variant="outlined"
+          onChange={this.handleChange}
+          value={this.state.acceptanceCriteria}
+          name="acceptanceCriteria"
+        />
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DesktopDatePicker
+            id="new-item-date"
+            label="Due Date"
+            value={this.state.dueDate}
+            onChange={this.handleDateChange}
+            renderInput={(params) => <TextField {...params} />}
+          />
+        </LocalizationProvider>
         <Button
           style={{ marginLeft: "10px" }}
           onClick={this.handleSubmit}
           variant="contained"
           color="primary"
+          data-testid="new-item-button"
         >
           Add
         </Button>
